@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Spinning Shapes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            text-align: center;
+            z-index: 10;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        
+        p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h1>3D Animation</h1>
+        <p>Spinning Cube & Sphere</p>
+    </div>
+    <div id="canvas-container"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000, 0);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+        
+        // Create cube
+        const cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
+        const cubeMaterial = new THREE.MeshPhongMaterial({ 
+            color: 0x00ff88,
+            shininess: 100,
+            specular: 0x222222
+        });
+        const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        cube.position.x = -3;
+        scene.add(cube);
+        
+        // Create sphere
+        const sphereGeometry = new THREE.SphereGeometry(1.5, 32, 32);
+        const sphereMaterial = new THREE.MeshPhongMaterial({ 
+            color: 0xff6b6b,
+            shininess: 100,
+            specular: 0x222222
+        });
+        const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        sphere.position.x = 3;
+        scene.add(sphere);
+        
+        // Add wireframe to cube
+        const cubeEdges = new THREE.EdgesGeometry(cubeGeometry);
+        const cubeLines = new THREE.LineSegments(
+            cubeEdges, 
+            new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 })
+        );
+        cube.add(cubeLines);
+        
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        
+        const pointLight1 = new THREE.PointLight(0xffffff, 1);
+        pointLight1.position.set(5, 5, 5);
+        scene.add(pointLight1);
+        
+        const pointLight2 = new THREE.PointLight(0xffffff, 0.5);
+        pointLight2.position.set(-5, -5, -5);
+        scene.add(pointLight2);
+        
+        // Camera position
+        camera.position.z = 8;
+        
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Rotate cube
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+            
+            // Rotate sphere
+            sphere.rotation.x += 0.005;
+            sphere.rotation.y += 0.01;
+            
+            renderer.render(scene, camera);
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Start animation
+        animate();
+    </script>
+</body>
+</html>
